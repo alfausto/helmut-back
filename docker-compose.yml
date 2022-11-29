@@ -1,0 +1,83 @@
+version: '2.2'
+#version: '3.7'
+
+#Script de definición de servicios para su levantamiento como entorno de trabajo
+
+services:
+  #InfluxDB. Base de datos
+  influxDB:
+    image: influxdb:2.5.1
+    ports:
+      - 8086:8086
+    volumes:
+      - E:\desarrollo\helmut-back\influxDB:/var/lib/influxdb
+      # ./influxDB:/var/lib/influxdb
+    #environment:
+    #  DOCKER_INFLUXDB_INIT_USERNAME: admin
+    #  DOCKER_INFLUXDB_INIT_PASSWORD: ro0tP@ss
+    #  DOCKER_INFLUXDB_INIT_BUCKET: my-bucket
+    networks:
+      helmut-net:
+        aliases:
+          - influxDB
+
+  #Mosquito (MQTT Server)
+  mosquitto:
+    image: eclipse-mosquitto:2.0.15
+    # en este caso se hace publico el puerto 1883 y 9001 del contenedor a sus homonimos en el host.
+    ports:
+      - 1883:1883
+      - 9001:9001
+    volumes:
+      #Forma WIndows
+      - E:\desarrollo\helmut-back\mosquitto\datos:/mosquitto/data
+      - E:\desarrollo\helmut-back\mosquitto\registros:/mosquitto/log
+      #Forma Linux/Mac
+      #- ./mosquitto/datos:/mosquitto/data
+      #- ./mosquitto/registros:/mosquitto/log
+    networks:
+      helmut-net:
+        aliases:
+          - mosquitto
+
+  #Telegraf (Agente de servicio. Recolector de informacion)
+  nodered:
+    image: telegraf:latest #1.24.3
+    ports:
+      - 8094:8094/tcp
+      - 8092:8092/udp
+    networks:
+      helmut-net:
+        aliases:
+          - telegraf
+
+#Definición de servicio Grafana
+  grafana:
+    image: "grafana/grafana:9.2.6"
+    ports:
+      - 3000:3000
+    volumes:
+      #Forma Windows
+      - E:\desarrollo\helmut-back\grafana:/var/lib/grafana
+      #Forma Linux/Mac
+      #- ./grafana:/var/lib/grafana
+    networks:
+      helmut-net:
+        aliases:
+          - grafana
+
+#Configuramos todas aquellas carpetas que se escibieron en los servicios. Se pueden usar distintos tipos de drivers, incluso para guardar directamente
+# la información en un servicio en la nube. En este caso, seleccionamos el driver "local".
+volumes:
+  influxDB:
+    driver: local
+  datos:
+    driver: local
+  registros:
+    driver: local
+  grafana:
+    driver: local
+  
+#Definicion de redes de trabajo entre contenedores.
+networks:
+  helmut-net: {}
