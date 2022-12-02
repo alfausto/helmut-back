@@ -48,6 +48,8 @@ services:
   telegraf:
     image: telegraf:latest #1.24.3
     restart: unless-stopped
+    volumes:
+      - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf
     ports:
       - 8094:8094/tcp
       - 8092:8092/udp
