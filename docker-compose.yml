@@ -6,16 +6,18 @@ version: '2.2'
 services:
   #InfluxDB. Base de datos
   influxDB:
-    image: influxdb:2.5.1
+    image: influxdb:1.8
+    restart: unless-stopped
     ports:
       - 8086:8086
     volumes:
-      - E:\desarrollo\helmut-back\influxDB:/var/lib/influxdb
-      # ./influxDB:/var/lib/influxdb
-    #environment:
-    #  DOCKER_INFLUXDB_INIT_USERNAME: admin
-    #  DOCKER_INFLUXDB_INIT_PASSWORD: ro0tP@ss
-    #  DOCKER_INFLUXDB_INIT_BUCKET: my-bucket
+      #- E:\desarrollo\helmut-back\influxDB:/var/lib/influxdb
+      - ./influxDB:/var/lib/influxdb
+    environment:
+      INFLUXDB_DB: 'ozono_db'
+      INFLUXDB_ADMIN_USER: 'root'
+      INFLUXDB_ADMIN_PASSWORD: 'root'
+      INFLUXDB_HTTP_AUTH_ENABLED: 'true'
     networks:
       helmut-net:
         aliases:
@@ -24,25 +26,28 @@ services:
   #Mosquito (MQTT Server)
   mosquitto:
     image: eclipse-mosquitto:2.0.15
+    restart: unless-stopped
     # en este caso se hace publico el puerto 1883 y 9001 del contenedor a sus homonimos en el host.
     ports:
       - 1883:1883
       - 9001:9001
     volumes:
       #Forma WIndows
-      - E:\desarrollo\helmut-back\mosquitto\datos:/mosquitto/data
-      - E:\desarrollo\helmut-back\mosquitto\registros:/mosquitto/log
+      #- E:\desarrollo\helmut-back\mosquitto\datos:/mosquitto/data
+      #- E:\desarrollo\helmut-back\mosquitto\registros:/mosquitto/log
       #Forma Linux/Mac
-      #- ./mosquitto/datos:/mosquitto/data
-      #- ./mosquitto/registros:/mosquitto/log
+      - ./mosquitto/datos:/mosquitto/data
+      - ./mosquitto/registros:/mosquitto/log
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
     networks:
       helmut-net:
         aliases:
           - mosquitto
 
   #Telegraf (Agente de servicio. Recolector de informacion)
-  nodered:
+  telegraf:
     image: telegraf:latest #1.24.3
+    restart: unless-stopped
     ports:
       - 8094:8094/tcp
       - 8092:8092/udp
@@ -54,13 +59,15 @@ services:
 #Definición de servicio Grafana
   grafana:
     image: "grafana/grafana:9.2.6"
+    restart: unless-stopped
     ports:
       - 3000:3000
     volumes:
       #Forma Windows
-      - E:\desarrollo\helmut-back\grafana:/var/lib/grafana
+      #- E:\desarrollo\helmut-back\grafana:/var/lib/grafana
       #Forma Linux/Mac
-      #- ./grafana:/var/lib/grafana
+      - ./grafana:/var/lib/grafana
+      - ./grafana-provisioning:/etc/grafana/provisioning 
     networks:
       helmut-net:
         aliases:
@@ -76,6 +83,8 @@ volumes:
   registros:
     driver: local
   grafana:
+    driver: local
+  grafana-provisioning:
     driver: local
   
 #Definicion de redes de trabajo entre contenedores.
