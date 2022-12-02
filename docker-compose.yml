@@ -18,6 +18,7 @@ services:
       INFLUXDB_ADMIN_USER: 'root'
       INFLUXDB_ADMIN_PASSWORD: 'root'
       INFLUXDB_HTTP_AUTH_ENABLED: 'true'
+      INFLUXDB_ADMIN_ENABLED: 'true'
     networks:
       helmut-net:
         aliases:
