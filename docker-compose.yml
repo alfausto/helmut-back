@@ -5,7 +5,7 @@ version: '2.2'
 
 services:
   #InfluxDB. Base de datos
-  influxDB:
+  influxdb:
     image: influxdb:1.8
     restart: unless-stopped
     ports:
@@ -22,7 +22,7 @@ services:
     networks:
       helmut-net:
         aliases:
-          - influxDB
+          - influxdb
 
   #Mosquito (MQTT Server)
   mosquitto:
