@@ -1,94 +1,48 @@
-version: '2.2'
-#version: '3.7'
-
-#Script de definición de servicios para su levantamiento como entorno de trabajo
+version: '3'
 
 services:
-  #InfluxDB. Base de datos
+  mosquitto:
+    image: eclipse-mosquitto:2
+    restart: unless-stopped
+    ports:
+      - 1883:1883
+    volumes:
+      - mosquitto_data:/mosquitto/data
+      - mosquitto_logs:/mosquitto/log
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+
+  telegraf:
+    image: telegraf:1.21.3
+    restart: unless-stopped
+    volumes:
+      - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf
+    depends_on:
+      - influxdb
+
+  grafana:
+    image: grafana/grafana:9.2.5
+    restart: unless-stopped
+    ports: 
+      - 3000:3000
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/grafana-provisioning/:/etc/grafana/provisionin  
+
   influxdb:
     image: influxdb:1.8
     restart: unless-stopped
     ports:
       - 8086:8086
     volumes:
-      #- E:\desarrollo\helmut-back\influxDB:/var/lib/influxdb
-      - ./influxDB:/var/lib/influxdb
+      - influxdb_data:/var/lib/influxdb
     environment:
       INFLUXDB_DB: 'ozono_db'
       INFLUXDB_ADMIN_USER: 'root'
       INFLUXDB_ADMIN_PASSWORD: 'root'
       INFLUXDB_HTTP_AUTH_ENABLED: 'true'
-    networks:
-      helmut-net:
-        aliases:
-          - influxdb
 
-  #Mosquito (MQTT Server)
-  mosquitto:
-    image: eclipse-mosquitto:2.0.15
-    restart: unless-stopped
-    # en este caso se hace publico el puerto 1883 y 9001 del contenedor a sus homonimos en el host.
-    ports:
-      - 1883:1883
-      - 9001:9001
-    volumes:
-      #Forma WIndows
-      #- E:\desarrollo\helmut-back\mosquitto\datos:/mosquitto/data
-      #- E:\desarrollo\helmut-back\mosquitto\registros:/mosquitto/log
-      #Forma Linux/Mac
-      - ./mosquitto/datos:/mosquitto/data
-      - ./mosquitto/registros:/mosquitto/log
-      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
-    networks:
-      helmut-net:
-        aliases:
-          - mosquitto
-
-  #Telegraf (Agente de servicio. Recolector de informacion)
-  telegraf:
-    image: telegraf:latest #1.24.3
-    restart: unless-stopped
-    volumes:
-      - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf
-    ports:
-      - 8094:8094/tcp
-      - 8092:8092/udp
-    networks:
-      helmut-net:
-        aliases:
-          - telegraf
-
-#Definición de servicio Grafana
-  grafana:
-    image: "grafana/grafana:9.2.6"
-    restart: unless-stopped
-    ports:
-      - 3000:3000
-    volumes:
-      #Forma Windows
-      #- E:\desarrollo\helmut-back\grafana:/var/lib/grafana
-      #Forma Linux/Mac
-      - ./grafana:/var/lib/grafana
-      - ./grafana-provisioning:/etc/grafana/provisioning 
-    networks:
-      helmut-net:
-        aliases:
-          - grafana
-
-#Configuramos todas aquellas carpetas que se escibieron en los servicios. Se pueden usar distintos tipos de drivers, incluso para guardar directamente
-# la información en un servicio en la nube. En este caso, seleccionamos el driver "local".
 volumes:
-  influxDB:
-    driver: local
-  datos:
-    driver: local
-  registros:
-    driver: local
-  grafana:
-    driver: local
-  grafana-provisioning:
-    driver: local
-  
-#Definicion de redes de trabajo entre contenedores.
-networks:
-  helmut-net: {}
+  mosquitto_data:
+  mosquitto_logs:
+  influxdb_data:
+  grafana_data:
