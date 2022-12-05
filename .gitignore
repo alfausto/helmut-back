@@ -1,7 +1,11 @@
 .DS_Store
 node_modules
 /dist
-
+/grafana
+/grafana-provisioning
+/influxDB
+/mosquitto
+/telegraf
 
 # local env files
 .env.local
