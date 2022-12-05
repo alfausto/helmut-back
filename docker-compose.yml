@@ -48,9 +48,6 @@ services:
       - 27019:27017
     volumes:
       - ./mongoDB/dbData:/data/db
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: pwd0438
 
 volumes:
   mosquitto_data:
