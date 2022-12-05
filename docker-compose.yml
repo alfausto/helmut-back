@@ -51,10 +51,6 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: pwd0438
-    networks:
-      parkingNetwork:
-        aliases:
-          - database
 
 volumes:
   mosquitto_data:
