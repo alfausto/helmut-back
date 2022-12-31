@@ -1,3 +1,7 @@
+#WINDOWS
+#docker run -dp 27017:27017 --name mongodb_helmut -v $PWD\mongodb\dbData:/data/db mongo:5.0.9
+#docker run -dp 8086:8086 --name influxdb_helmut -v $PWD\influxDB\dbData:/var/lib/influxdb influxdb:1.8
+
 version: '3'
 
 services:
@@ -7,27 +11,54 @@ services:
     ports:
       - 1883:1883
     volumes:
-      - mosquitto_data:/mosquitto/data
-      - mosquitto_logs:/mosquitto/log
-      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      #LINUX
+      #- mosquitto_data:/mosquitto/data
+      #- mosquitto_logs:/mosquitto/log
+      #- ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      #WINDOWS
+      - E:\desarrollo\helmut-back\mosquitto\mosquitto_data:/mosquitto/data
+      - E:\desarrollo\helmut-back\mosquitto\mosquitto_logs:/mosquitto/log
+      - E:\desarrollo\helmut-back\mosquitto\mosquitto.conf:/mosquitto/config/mosquitto.conf
+
+  mariadb:
+    image: mariadb:10.8
+    restart: unless-stopped
+    ports:
+      - 3308:3306
+    volumes:
+      #WINDOWS
+      - E:\desarrollo\helmut-back\mariadb\dbData:/var/lib/mysql
+      - E:\desarrollo\helmut-back\mariadb\mysqld:/var/run/mysqld
+      #LINUX/MAC
+      #- .\mariadb\dbData:/var/lib/mysql
+      #- .\mariadb\mysqld:/var/run/mysqld
+    environment:
+      MARIADB_ROOT_PASSWORD: pwd0438
 
   telegraf:
     image: telegraf:1.21.3
     restart: unless-stopped
     volumes:
-      - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf
+      #WINDOWS
+      - E:\desarrollo\helmut-back\telegraf\telegraf.conf:/etc/telegraf/telegraf.conf
+      #LINUX
+      #- ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf
+
     depends_on:
       - influxdb
 
   grafana:
-    image: grafana/grafana:9.2.5
+    image: grafana/grafana:9.3.2
     restart: unless-stopped
     ports: 
       - 3000:3000
     volumes:
-      - grafana_data:/var/lib/grafana
-      - ./grafana/grafana-provisioning/:/etc/grafana/provisioning
-      - ./grafana.ini:/etc/grafana/grafana.ini
+      #LINUX
+      #- grafana_data:/var/lib/grafana
+      #- ./grafana/grafana-provisioning/:/etc/grafana/provisioning  
+      #WINDOWS
+      - E:\desarrollo\helmut-back\grafana\grafana_data:/var/lib/grafana
+      - E:\desarrollo\helmut-back\grafana\grafana-provisioning/:/etc/grafana/provisioning  
 
   influxdb:
     image: influxdb:1.8
@@ -35,31 +66,20 @@ services:
     ports:
       - 8086:8086
     volumes:
-      - influxdb_data:/var/lib/influxdb
+      #LINUX
+      #- ./influxDB/dbData:/var/lib/influxdb
+      #WINDOWS
+      - E:\desarrollo\helmut-back\influxDB\dbData:/var/lib/influxdb
     environment:
       INFLUXDB_DB: 'ozono_db'
       INFLUXDB_ADMIN_USER: 'root'
       INFLUXDB_ADMIN_PASSWORD: 'root'
       INFLUXDB_HTTP_AUTH_ENABLED: 'true'
-  
-  mysql:
-    image: mariadb:10.8
-    ports:
-      - 3308:3306
-    volumes:
-      #WINDOWS
-      #- E:\desarrollo\SuomiAir\dbData:/var/lib/mysql
-      #- E:\desarrollo\SuomiAir\mysqld:/var/run/mysqld
-      #LINUX/MAC
-      - ./mariadb/dbData:/var/lib/mysql
-      - ./mariadb/mysqld:/var/run/mysqld
-
-    environment:
-      MARIADB_ROOT_PASSWORD: pwd0438
 
 volumes:
   mosquitto_data:
   mosquitto_logs:
   influxdb_data:
   grafana_data:
+  grafana_provisioning:
   dbData:

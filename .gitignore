@@ -1,9 +1,8 @@
 .DS_Store
 node_modules
-/dist
 /grafana
-/grafana-provisioning
 /influxDB
+/mariadb
 /mosquitto
 /telegraf
 
