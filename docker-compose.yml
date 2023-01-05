@@ -12,13 +12,13 @@ services:
       - 1883:1883
     volumes:
       #LINUX
-      #- mosquitto_data:/mosquitto/data
-      #- mosquitto_logs:/mosquitto/log
-      #- ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - mosquitto_data:/mosquitto/data
+      - mosquitto_logs:/mosquitto/log
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
       #WINDOWS
-      - E:\desarrollo\helmut-back\mosquitto\mosquitto_data:/mosquitto/data
-      - E:\desarrollo\helmut-back\mosquitto\mosquitto_logs:/mosquitto/log
-      - E:\desarrollo\helmut-back\mosquitto\mosquitto.conf:/mosquitto/config/mosquitto.conf
+      #- E:\desarrollo\helmut-back\mosquitto\mosquitto_data:/mosquitto/data
+      #- E:\desarrollo\helmut-back\mosquitto\mosquitto_logs:/mosquitto/log
+      #- E:\desarrollo\helmut-back\mosquitto\mosquitto.conf:/mosquitto/config/mosquitto.conf
 
   mariadb:
     image: mariadb:10.8
@@ -27,11 +27,11 @@ services:
       - 3308:3306
     volumes:
       #WINDOWS
-      - E:\desarrollo\helmut-back\mariadb\dbData:/var/lib/mysql
-      - E:\desarrollo\helmut-back\mariadb\mysqld:/var/run/mysqld
+      #- E:\desarrollo\helmut-back\mariadb\dbData:/var/lib/mysql
+      #- E:\desarrollo\helmut-back\mariadb\mysqld:/var/run/mysqld
       #LINUX/MAC
-      #- .\mariadb\dbData:/var/lib/mysql
-      #- .\mariadb\mysqld:/var/run/mysqld
+      - .\mariadb\dbData:/var/lib/mysql
+      - .\mariadb\mysqld:/var/run/mysqld
     environment:
       MARIADB_ROOT_PASSWORD: pwd0438
 
@@ -40,9 +40,9 @@ services:
     restart: unless-stopped
     volumes:
       #WINDOWS
-      - E:\desarrollo\helmut-back\telegraf\telegraf.conf:/etc/telegraf/telegraf.conf
+      #- E:\desarrollo\helmut-back\telegraf\telegraf.conf:/etc/telegraf/telegraf.conf
       #LINUX
-      #- ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf
+      - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf
 
     depends_on:
       - influxdb
@@ -54,11 +54,12 @@ services:
       - 3000:3000
     volumes:
       #LINUX
-      #- grafana_data:/var/lib/grafana
-      #- ./grafana/grafana-provisioning/:/etc/grafana/provisioning  
+      - grafana_data:/var/lib/grafana
+      - ./grafana/grafana-provisioning/:/etc/grafana/provisioning
+      - ./grafana.ini:/etc/grafana/grafana.ini
       #WINDOWS
-      - E:\desarrollo\helmut-back\grafana\grafana_data:/var/lib/grafana
-      - E:\desarrollo\helmut-back\grafana\grafana-provisioning/:/etc/grafana/provisioning  
+      #- E:\desarrollo\helmut-back\grafana\grafana_data:/var/lib/grafana
+      #- E:\desarrollo\helmut-back\grafana\grafana-provisioning/:/etc/grafana/provisioning  
 
   influxdb:
     image: influxdb:1.8
@@ -67,9 +68,9 @@ services:
       - 8086:8086
     volumes:
       #LINUX
-      #- ./influxDB/dbData:/var/lib/influxdb
+      - ./influxDB/dbData:/var/lib/influxdb
       #WINDOWS
-      - E:\desarrollo\helmut-back\influxDB\dbData:/var/lib/influxdb
+      #- E:\desarrollo\helmut-back\influxDB\dbData:/var/lib/influxdb
     environment:
       INFLUXDB_DB: 'ozono_db'
       INFLUXDB_ADMIN_USER: 'root'
